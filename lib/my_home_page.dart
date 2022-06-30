@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hive_database_demo/data_model.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+
 const String dataBoxName = "data";
 
-
-
 class MyHomePage extends StatefulWidget {
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-enum DataFilter {ALL, COMPLETED, PROGRESS}
+enum DataFilter { ALL, COMPLETED, PROGRESS }
 
 class _MyHomePageState extends State<MyHomePage> {
   Box<DataModel> dataBox;
@@ -29,7 +27,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -38,15 +35,15 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: (value) {
-              if(value.compareTo("All") == 0){
+              if (value.compareTo("All") == 0) {
                 setState(() {
                   filter = DataFilter.ALL;
                 });
-              }else if (value.compareTo("Compeleted") == 0){
+              } else if (value.compareTo("Compeleted") == 0) {
                 setState(() {
                   filter = DataFilter.COMPLETED;
                 });
-              }else{
+              } else {
                 setState(() {
                   filter = DataFilter.PROGRESS;
                 });
@@ -63,23 +60,26 @@ class _MyHomePageState extends State<MyHomePage> {
           )
         ],
       ),
-
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
             ValueListenableBuilder(
               valueListenable: dataBox.listenable(),
-
-              builder: (context, Box<DataModel> items, _){
-
+              builder: (context, Box<DataModel> items, _) {
                 List<int> keys;
 
-                if(filter == DataFilter.ALL){
+                if (filter == DataFilter.ALL) {
                   keys = items.keys.cast<int>().toList();
-                }else if(filter == DataFilter.COMPLETED){
-                  keys = items.keys.cast<int>().where((key) => items.get(key).complete).toList();
-                }else{
-                  keys = items.keys.cast<int>().where((key) => !items.get(key).complete).toList();
+                } else if (filter == DataFilter.COMPLETED) {
+                  keys = items.keys
+                      .cast<int>()
+                      .where((key) => items.get(key).complete)
+                      .toList();
+                } else {
+                  keys = items.keys
+                      .cast<int>()
+                      .where((key) => !items.get(key).complete)
+                      .toList();
                 }
 
                 return ListView.separated(
@@ -88,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   shrinkWrap: true,
                   scrollDirection: Axis.vertical,
                   physics: NeverScrollableScrollPhysics(),
-                  itemBuilder:(_, index){
+                  itemBuilder: (_, index) {
                     final int key = keys[index];
                     final DataModel data = items.get(key);
                     return Card(
@@ -97,15 +97,27 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       color: Colors.blueGrey[200],
                       child: ListTile(
-                        title: Text(data.title, style: TextStyle(fontSize: 22,color: Colors.black),),
-                        subtitle: Text(data.description,style: TextStyle(fontSize: 20,color:Colors.black38)),
-                        leading: Text("$key", style: TextStyle(fontSize: 18,color: Colors.black),),
-                        trailing: Icon(Icons.check, color: data.complete ? Colors.deepPurpleAccent : Colors.red,),
-                        onTap: (){
+                        title: Text(
+                          data.title,
+                          style: TextStyle(fontSize: 22, color: Colors.black),
+                        ),
+                        subtitle: Text(data.description,
+                            style:
+                                TextStyle(fontSize: 20, color: Colors.black38)),
+                        leading: Text(
+                          "$key",
+                          style: TextStyle(fontSize: 18, color: Colors.black),
+                        ),
+                        trailing: Icon(
+                          Icons.check,
+                          color: data.complete
+                              ? Colors.deepPurpleAccent
+                              : Colors.red,
+                        ),
+                        onTap: () {
                           showDialog(
-                              context: context,
-                              child: Dialog(
-                                backgroundColor: Colors.white,
+                              builder: (context) => Dialog(
+                                  backgroundColor: Colors.white,
                                   child: Container(
                                     padding: EdgeInsets.all(16),
                                     child: Column(
@@ -113,44 +125,45 @@ class _MyHomePageState extends State<MyHomePage> {
                                       children: <Widget>[
                                         FlatButton(
                                           shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10.0),
+                                            borderRadius:
+                                                BorderRadius.circular(10.0),
                                           ),
                                           color: Colors.blueAccent[100],
-                                          child: Text("Mark as complete",style: TextStyle(color: Colors.black87),),
+                                          child: Text(
+                                            "Mark as complete",
+                                            style: TextStyle(
+                                                color: Colors.black87),
+                                          ),
                                           onPressed: () {
                                             DataModel mData = DataModel(
                                                 title: data.title,
                                                 description: data.description,
-                                                complete: true
-                                            );
+                                                complete: true);
                                             dataBox.put(key, mData);
                                             Navigator.pop(context);
                                           },
                                         )
                                       ],
                                     ),
-                                  )
-                              )
-                          );
+                                  )));
                         },
                       ),
                     );
                   },
-
                 );
               },
             ),
-            SizedBox(height: 20,)
+            SizedBox(
+              height: 20,
+            )
           ],
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
-        onPressed: (){
+        onPressed: () {
           showDialog(
-              context: context,
-              child: Dialog(
-                backgroundColor: Colors.blueGrey[100],
+              builder: (context) => Dialog(
+                  backgroundColor: Colors.blueGrey[100],
                   child: Container(
                     padding: EdgeInsets.all(16),
                     child: Column(
@@ -175,23 +188,27 @@ class _MyHomePageState extends State<MyHomePage> {
                             borderRadius: BorderRadius.circular(10.0),
                           ),
                           color: Colors.red,
-                          child: Text("Add Data",style: TextStyle(color: Colors.white),),
+                          child: Text(
+                            "Add Data",
+                            style: TextStyle(color: Colors.white),
+                          ),
                           onPressed: () {
                             final String title = titleController.text;
-                            final String description = descriptionController.text;
+                            final String description =
+                                descriptionController.text;
                             titleController.clear();
                             descriptionController.clear();
-                            DataModel data = DataModel(title: title, description: description, complete: false);
+                            DataModel data = DataModel(
+                                title: title,
+                                description: description,
+                                complete: false);
                             dataBox.add(data);
                             Navigator.pop(context);
-
                           },
                         )
                       ],
                     ),
-                  )
-              )
-          );
+                  )));
         },
         child: Icon(Icons.add),
       ),
